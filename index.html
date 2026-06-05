@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GROK ARCADE</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;display=swap');
+
+    :root {
+      --neon-cyan: #00f0ff;
+      --neon-magenta: #ff00aa;
+      --neon-yellow: #ffee00;
+      --neon-green: #00ff9d;
+      --crt-bg: #0a0a0f;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #050508;
+      color: #ddd;
+      font-family: "Press Start 2P", system-ui, monospace;
+      line-height: 1.4;
+      overflow-x: hidden;
+    }
+
+    .scanlines {
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        rgba(0, 240, 255, 0.03) 0px,
+        rgba(0, 240, 255, 0.03) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      pointer-events: none;
+      z-index: 999;
+      animation: flicker 0.15s infinite alternate;
+    }
+
+    @keyframes flicker {
+      0% { opacity: 0.92; }
+      100% { opacity: 1; }
+    }
+
+    .crt {
+      position: relative;
+    }
+    .crt::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.4) 90%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    header {
+      text-align: center;
+      padding: 24px 12px 12px;
+      background: linear-gradient(#111, #050508);
+      border-bottom: 6px solid #222;
+    }
+
+    .logo {
+      font-size: 42px;
+      letter-spacing: 6px;
+      color: #fff;
+      text-shadow:
+        0 0 10px var(--neon-cyan),
+        0 0 20px var(--neon-cyan),
+        0 0 40px var(--neon-magenta);
+      margin: 0 0 4px;
+    }
+
+    .logo span {
+      color: var(--neon-yellow);
+      text-shadow: 0 0 10px var(--neon-yellow), 0 0 20px var(--neon-magenta);
+    }
+
+    .tagline {
+      font-size: 11px;
+      color: var(--neon-magenta);
+      letter-spacing: 3px;
+      margin: 0;
+    }
+
+    .credits-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-top: 12px;
+      font-size: 10px;
+      color: var(--neon-green);
+    }
+
+    .coin {
+      background: #333;
+      border: 2px solid #666;
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: all 0.1s;
+      user-select: none;
+    }
+    .coin:active {
+      transform: scale(0.9);
+      background: #222;
+    }
+
+    .credit-count {
+      font-size: 14px;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .arcade-hall {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 30px 16px 60px;
+    }
+
+    .hall-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .hall-header h2 {
+      font-size: 16px;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 8px var(--neon-cyan);
+      margin: 0 0 6px;
+    }
+
+    .games {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 28px;
+    }
+
+    .cabinet {
+      background: #111;
+      border: 8px solid #222;
+      border-radius: 4px;
+      box-shadow: 0 10px 0 #000,
+                  inset 0 0 0 4px #333,
+                  0 0 0 2px #444;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .cabinet:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 0 #000,
+                  inset 0 0 0 4px #333,
+                  0 0 0 2px #444,
+                  0 0 30px rgba(0, 240, 255, 0.15);
+    }
+
+    .marquee {
+      background: #1a0033;
+      color: #fff;
+      text-align: center;
+      padding: 8px 6px;
+      font-size: 13px;
+      letter-spacing: 2px;
+      border-bottom: 3px solid #000;
+      text-shadow: 0 0 6px currentColor;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .marquee.ris { color: var(--neon-cyan); background: #002222; }
+    .marquee.aga { color: var(--neon-yellow); background: #221100; }
+    .marquee.man { color: var(--neon-magenta); background: #220022; }
+
+    .screen {
+      background: #000;
+      padding: 8px;
+      border-bottom: 4px solid #222;
+      position: relative;
+    }
+
+    .screen canvas,
+    .screen img {
+      display: block;
+      width: 100%;
+      height: auto;
+      image-rendering: pixelated;
+      border: 3px solid #111;
+      background: #000;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+    }
+
+    .info {
+      padding: 12px 14px 16px;
+      font-size: 9px;
+      line-height: 1.5;
+      background: #0c0c12;
+    }
+
+    .info h3 {
+      margin: 0 0 6px;
+      font-size: 11px;
+      color: #fff;
+    }
+
+    .info p {
+      margin: 0 0 10px;
+      color: #aaa;
+      font-size: 9px;
+    }
+
+    .controls {
+      margin: 8px 0;
+      padding-left: 12px;
+      font-size: 8px;
+      color: #888;
+    }
+
+    .play-btn {
+      display: block;
+      width: 100%;
+      background: #222;
+      color: var(--neon-cyan);
+      border: 3px solid var(--neon-cyan);
+      font-family: "Press Start 2P", monospace;
+      font-size: 11px;
+      padding: 10px 8px;
+      margin-top: 8px;
+      cursor: pointer;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.1s;
+      box-shadow: 0 0 0 3px #000;
+    }
+    .play-btn:hover {
+      background: var(--neon-cyan);
+      color: #000;
+      box-shadow: 0 0 12px var(--neon-cyan);
+    }
+    .play-btn:active {
+      transform: scale(0.97);
+    }
+
+    .footer {
+      text-align: center;
+      padding: 30px 12px 40px;
+      font-size: 8px;
+      color: #555;
+      border-top: 2px solid #222;
+    }
+
+    .footer a {
+      color: var(--neon-magenta);
+      text-decoration: none;
+    }
+
+    .neon-text {
+      text-shadow:
+        0 0 4px var(--neon-cyan),
+        0 0 8px var(--neon-cyan);
+    }
+  </style>
+</head>
+<body>
+  <div class="scanlines"></div>
+
+  <header class="crt">
+    <h1 class="logo">GROK<span>ARCADE</span></h1>
+    <p class="tagline">3 CLASSICS • NO QUARTERS NEEDED</p>
+
+    <div class="credits-bar">
+      <div class="coin" onclick="insertCoin()" title="Click to insert coin">⬡ INSERT COIN</div>
+      <div class="credit-count">CREDITS <span id="credits">0</span></div>
+    </div>
+  </header>
+
+  <div class="arcade-hall crt">
+    <div class="hall-header">
+      <h2>SELECT YOUR GAME</h2>
+      <div style="font-size:8px; color:#555;">HOLD ARROW KEYS • SIMULTANEOUS ACTION • RETRO FUN</div>
+    </div>
+
+    <div class="games">
+      <!-- GROK-RIS -->
+      <div class="cabinet" id="cab-ris">
+        <div class="marquee ris">GROK-RIS</div>
+        <div class="screen">
+          <img src="grok-ris-start.jpg" alt="Grok-ris starting state screenshot">
+        </div>
+        <div class="info">
+          <h3>CLASSIC BLOCK STACKING</h3>
+          <p>A faithful homage to Tetris. 7-bag randomizer, hold piece, ghost, wall kicks, and proper Nintendo scoring.</p>
+          <div class="controls">
+            ← → move • ↓ soft • ↑ rotate • SPACE hard • C hold • P pause • R restart
+          </div>
+          <button class="play-btn" onclick="playGame('grok-ris')">PLAY GROK-RIS</button>
+        </div>
+      </div>
+
+      <!-- GROK-AGA -->
+      <div class="cabinet" id="cab-aga">
+        <div class="marquee aga">GROK-AGA</div>
+        <div class="screen">
+          <img src="grok-aga-start.jpg" alt="Grok-aga starting state screenshot">
+        </div>
+        <div class="info">
+          <h3>SPACE INVASION SHOOTER</h3>
+          <p>Galaga-style action where you can move AND shoot at the same time. Formation dives, rapid fire, multiple waves.</p>
+          <div class="controls">
+            ← → strafe • SPACE / Z / X rapid fire (hold while moving!) • P pause • R restart
+          </div>
+          <button class="play-btn" onclick="playGame('grok-aga')">PLAY GROK-AGA</button>
+        </div>
+      </div>
+
+      <!-- GROK-MAN -->
+      <div class="cabinet" id="cab-man">
+        <div class="marquee man">GROK-MAN</div>
+        <div class="screen">
+          <img src="grok-man-start.jpg" alt="Grok-man starting state screenshot">
+        </div>
+        <div class="info">
+          <h3>MAZE CHASE TRIBUTE</h3>
+          <p>Copyright-safe Pac-Man with a rotating Grok "G" chomper, eyeless spirits, 3 original levels, power pellets, player-only tunnels, and a real lives system.</p>
+          <div class="controls">
+            ARROWS to move • P pause • R restart
+          </div>
+          <button class="play-btn" onclick="playGame('grok-man')">PLAY GROK-MAN</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    BUILT LIVE WITH GROK • 2026<br>
+    All games are 100% self-contained single-file experiences.<br>
+    <a href="https://github.com/vern-c" target="_blank">github.com/vern-c</a>
+    •
+    <span style="color:#444">RETRO NEVER DIES</span>
+  </div>
+
+  <script>
+    // --- Retro Audio (same spirit as the individual games) ---
+    let audioCtx;
+    function getAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      return audioCtx;
+    }
+    function playBeep(freq = 440, duration = 80, type = 'square', volume = 0.3) {
+      const ctx = getAudio();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const filter = ctx.createBiquadFilter();
+
+      osc.type = type;
+      osc.frequency.value = freq;
+
+      filter.type = 'lowpass';
+      filter.frequency.value = 1200;
+
+      gain.gain.value = volume;
+
+      const decay = ctx.createGain();
+      decay.gain.value = 1;
+
+      osc.connect(filter);
+      filter.connect(decay);
+      decay.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      setTimeout(() => {
+        decay.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+        setTimeout(() => osc.stop(), 120);
+      }, duration);
+    }
+
+    function playCoinSound() {
+      const ctx = getAudio();
+      // Classic coin jingle
+      playBeep(880, 60, 'square', 0.35);
+      setTimeout(() => playBeep(1320, 90, 'square', 0.35), 90);
+      setTimeout(() => playBeep(1760, 140, 'square', 0.3), 200);
+    }
+
+    // --- Credits system ---
+    let credits = 0;
+    function updateCredits() {
+      const el = document.getElementById('credits');
+      el.textContent = credits;
+      el.style.color = credits > 0 ? '#0f0' : '#0a0';
+    }
+    function insertCoin() {
+      credits = Math.min(credits + 1, 9);
+      updateCredits();
+      playCoinSound();
+      // fun flash on cabinets
+      document.querySelectorAll('.cabinet').forEach(c => {
+        c.style.boxShadow = '0 0 20px #0f0';
+        setTimeout(() => { c.style.boxShadow = ''; }, 280);
+      });
+    }
+
+    // --- Game links ---
+    const GAME_URLS = {
+      'grok-ris': 'https://vern-c.github.io/grok-ris/',
+      'grok-aga': 'https://vern-c.github.io/grok-aga/',
+      'grok-man': 'https://vern-c.github.io/grok-man/'
+    };
+
+    function playGame(key) {
+      if (credits > 0) {
+        credits--;
+        updateCredits();
+        playBeep(660, 40, 'sawtooth', 0.4);
+      } else {
+        // Still let them play, just a little nag sound
+        playBeep(220, 120, 'square', 0.25);
+      }
+      window.open(GAME_URLS[key], '_blank');
+    }
+
+    // --- Static Screenshot Previews ---
+    // Setup click feedback on the game screenshot images for retro arcade feel.
+    function setupScreenshotClicks() {
+      const keys = ['ris', 'aga', 'man'];
+      keys.forEach(key => {
+        const img = document.querySelector(`#cab-${key} .screen img`);
+        if (img) {
+          img.style.cursor = 'pointer';
+          img.addEventListener('click', () => {
+            playBeep(key === 'ris' ? 520 : key === 'aga' ? 880 : 330, 60, 'square', 0.25);
+            const cab = document.getElementById('cab-' + key);
+            cab.style.borderColor = '#fff';
+            setTimeout(() => { cab.style.borderColor = ''; }, 180);
+          });
+        }
+      });
+    }
+
+    // The old animated draw functions have been removed in favor of static start-state screenshots.
+
+
+
+
+
+
+
+    // --- Boot ---
+    function boot() {
+      updateCredits();
+
+      // Setup click feedback on the static game screenshots
+      setupScreenshotClicks();
+
+      // Random occasional "attract" beeps (very subtle)
+      setInterval(() => {
+        if (Math.random() < 0.25) {
+          playBeep(180 + Math.random() * 60, 30, 'square', 0.08);
+        }
+      }, 4200);
+
+      // Keyboard easter egg: press "c" anywhere to insert coin
+      document.addEventListener('keydown', (e) => {
+        if (e.key.toLowerCase() === 'c') {
+          insertCoin();
+        }
+        if (e.key === '?') {
+          // secret full credits
+          credits = 9;
+          updateCredits();
+          playCoinSound();
+        }
+      });
+
+      // Welcome message in console for nerds
+      console.log('%c[GROK ARCADE] Retro hub ready. Click screenshots for sound. Press C to insert coin.', 'color:#444');
+    }
+
+    window.onload = boot;
+  </script>
+</body>
+</html>

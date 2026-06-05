@@ -2,15 +2,15 @@
 
 An 80's-inspired retro arcade lobby that brings together the three Grok-built games:
 
-- **Grok-ris** — Tetris homage (bag randomizer, hold, ghost, wall kicks)
-- **Grok-aga** — Galaga homage with true simultaneous move + shoot
-- **Grok-Man** — Copyright-safe Pac-Man tribute (G chomper, eyeless spirits, 3 original levels, lives, tunnels, power pellets)
+- **Grok-ris** — Stack blocks or die trying. Magic bag included (no refunds on bad pieces)
+- **Grok-aga** — Move AND shoot like the multitasker your parents never believed in
+- **Grok-Man** — The G that chomps back. Eyeless spirits, questionable life choices, zero lawyers involved
 
 **Play instantly:** Open `index.html` locally or visit the live collection once deployed.
 
 ## Features of this hub page
 - Pure retro CRT / neon aesthetic (Press Start 2P font, scanlines, glows)
-- Three animated canvas "previews" that actually show a tiny slice of each game in action
+- Static start-screen "screenshots" that actually look like real arcade machines (no tiny moving pixels this time)
 - Insert Coin mechanic + credit counter (with classic coin jingle)
 - Direct links to the individual live games on GitHub Pages
 - Fully self-contained single `index.html` (~18 KB)

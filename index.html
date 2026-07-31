@@ -174,6 +174,20 @@
     .marquee.ris { color: var(--neon-cyan); background: #002222; }
     .marquee.aga { color: var(--neon-yellow); background: #221100; }
     .marquee.man { color: var(--neon-magenta); background: #220022; }
+    .marquee.out { color: var(--neon-green); background: #002211; }
+    .marquee.roids { color: var(--neon-cyan); background: #001122; }
+    .marquee.ger { color: var(--neon-yellow); background: #1a1a00; }
+
+    .play-btn.out { color: var(--neon-green); border-color: var(--neon-green); }
+    .play-btn.out:hover { background: var(--neon-green); color: #000; box-shadow: 0 0 12px var(--neon-green); }
+    .play-btn.roids { color: var(--neon-cyan); border-color: var(--neon-cyan); }
+    .play-btn.roids:hover { background: var(--neon-cyan); color: #000; box-shadow: 0 0 12px var(--neon-cyan); }
+    .play-btn.ger { color: var(--neon-yellow); border-color: var(--neon-yellow); }
+    .play-btn.ger:hover { background: var(--neon-yellow); color: #000; box-shadow: 0 0 12px var(--neon-yellow); }
+    .play-btn.man { color: var(--neon-magenta); border-color: var(--neon-magenta); }
+    .play-btn.man:hover { background: var(--neon-magenta); color: #000; box-shadow: 0 0 12px var(--neon-magenta); }
+    .play-btn.aga { color: var(--neon-yellow); border-color: var(--neon-yellow); }
+    .play-btn.aga:hover { background: var(--neon-yellow); color: #000; box-shadow: 0 0 12px var(--neon-yellow); }
 
     .screen {
       background: #000;
@@ -270,7 +284,7 @@
 
   <header class="crt">
     <h1 class="logo">GROK<span>ARCADE</span></h1>
-    <p class="tagline">3 CLASSICS • NO QUARTERS NEEDED</p>
+    <p class="tagline">6 CLASSICS • NO QUARTERS NEEDED</p>
 
     <div class="credits-bar">
       <div class="coin" onclick="insertCoin()" title="Click to insert coin">⬡ INSERT COIN</div>
@@ -313,7 +327,7 @@
           <div class="controls">
             ← → strafe • SPACE / Z / X rapid fire (hold while moving!) • P pause • R restart
           </div>
-          <button class="play-btn" onclick="playGame('grok-aga')">PLAY GROK-AGA</button>
+          <button class="play-btn aga" onclick="playGame('grok-aga')">PLAY GROK-AGA</button>
         </div>
       </div>
 
@@ -329,7 +343,55 @@
           <div class="controls">
             ARROWS to move • P pause • R restart
           </div>
-          <button class="play-btn" onclick="playGame('grok-man')">PLAY GROK-MAN</button>
+          <button class="play-btn man" onclick="playGame('grok-man')">PLAY GROK-MAN</button>
+        </div>
+      </div>
+
+      <!-- GROK-OUT -->
+      <div class="cabinet" id="cab-out">
+        <div class="marquee out">GROK-OUT</div>
+        <div class="screen">
+          <img src="grok-out-start.jpg" alt="Grok-out starting state screenshot">
+        </div>
+        <div class="info">
+          <h3>PADDLE. BALL. BRICKS WITH ISSUES.</h3>
+          <p>Breakout but the bricks have commitment issues and the power-ups lie to you sometimes. Hold left/right while the ball judges your life choices.</p>
+          <div class="controls">
+            ← → paddle • SPACE launch / laser • P pause • R restart
+          </div>
+          <button class="play-btn out" onclick="playGame('grok-out')">PLAY GROK-OUT</button>
+        </div>
+      </div>
+
+      <!-- GROK-ROIDS -->
+      <div class="cabinet" id="cab-roids">
+        <div class="marquee roids">GROK-ROIDS</div>
+        <div class="screen">
+          <img src="grok-roids-start.jpg" alt="Grok-roids starting state screenshot">
+        </div>
+        <div class="info">
+          <h3>THRUST. SPIN. PANIC. REPEAT.</h3>
+          <p>Neon vector Asteroids. Hold rotate + thrust + fire like the multitasker your parents never believed in. Rocks split. The saucer has opinions.</p>
+          <div class="controls">
+            ← → rotate • ↑ thrust • ↓ reverse • SPACE fire • P pause • R restart
+          </div>
+          <button class="play-btn roids" onclick="playGame('grok-roids')">PLAY GROK-ROIDS</button>
+        </div>
+      </div>
+
+      <!-- GROK-GER -->
+      <div class="cabinet" id="cab-ger">
+        <div class="marquee ger">GROK-GER</div>
+        <div class="screen">
+          <img src="grok-ger-start.jpg" alt="Grok-ger starting state screenshot">
+        </div>
+        <div class="info">
+          <h3>TOUCH GRASS (PIXEL GRASS)</h3>
+          <p>Cross the road. Question the traffic. Hop a neon G through deadlines and a river of cope until you fill every goal pad. Therapy optional.</p>
+          <div class="controls">
+            ARROWS hop • P pause • R restart
+          </div>
+          <button class="play-btn ger" onclick="playGame('grok-ger')">PLAY GROK-GER</button>
         </div>
       </div>
     </div>
@@ -409,7 +471,10 @@
     const GAME_URLS = {
       'grok-ris': 'https://vern-c.github.io/grok-ris/',
       'grok-aga': 'https://vern-c.github.io/grok-aga/',
-      'grok-man': 'https://vern-c.github.io/grok-man/'
+      'grok-man': 'https://vern-c.github.io/grok-man/',
+      'grok-out': 'https://vern-c.github.io/grok-out/',
+      'grok-roids': 'https://vern-c.github.io/grok-roids/',
+      'grok-ger': 'https://vern-c.github.io/grok-ger/'
     };
 
     function playGame(key) {
@@ -427,13 +492,14 @@
     // --- Static Screenshot Previews ---
     // Setup click feedback on the game screenshot images for retro arcade feel.
     function setupScreenshotClicks() {
-      const keys = ['ris', 'aga', 'man'];
+      const tones = { ris: 520, aga: 880, man: 330, out: 660, roids: 440, ger: 390 };
+      const keys = Object.keys(tones);
       keys.forEach(key => {
         const img = document.querySelector(`#cab-${key} .screen img`);
         if (img) {
           img.style.cursor = 'pointer';
           img.addEventListener('click', () => {
-            playBeep(key === 'ris' ? 520 : key === 'aga' ? 880 : 330, 60, 'square', 0.25);
+            playBeep(tones[key], 60, 'square', 0.25);
             const cab = document.getElementById('cab-' + key);
             cab.style.borderColor = '#fff';
             setTimeout(() => { cab.style.borderColor = ''; }, 180);
